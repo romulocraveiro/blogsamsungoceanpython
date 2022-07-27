@@ -1,19 +1,26 @@
-from flask import Flask, render_template  # do módulo flask, importar a classe Flask
+from flask import Flask, render_template  
+from datetime import datetime
 
+app = Flask ("hello") 
 
-app = Flask ("hello") # por convenção, o nome da variável é app
-
-# todos os recursos usados vão partir da variável. Ex.: app.route
+# lista de dicionários:
+posts = [
+    {
+        "title": "O meu primeiro post",
+        "body": "Aqui é o texto do post",
+        "author": "Feulo",
+        "created": datetime(2022, 7, 25)
+    },
+     {
+        "title": "O meu segundo post",
+        "body": "Aqui é o texto do post",
+        "author": "Danilo",
+        "created": datetime(2022, 7, 26)
+    }
+]
 
 @app.route("/")
-@app.route("/hello")
+def index(): #padrão de nomear esse tipo de função
+    return render_template("index.html", posts = posts) #vai ter uma variável posts no html 
+    #que recebe posts daqui
 
-def hello():
-    return "Hello World"
-
-#nova rota:
-
-@app.route("/meucontato")
-def meuContato():
-    return render_template('index.html')
-    
