@@ -2,18 +2,15 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, current_user, logout_user, login_user, login_required
+from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
 
-# UserMixin é como o Model. Queremos que o usuário seja logável
-from werkzeug.security import check_password_hash, generate_password_hash
 
 
 app = Flask("hello") #nome da aplicação
-#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db" # este eu uso só para testar aqui
+#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db" # este eu uso só para testar no gitpod
 # para usar no Heroku, variável de ambiente que ele enviou:
-# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
-#ou:
 db_url = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
 app.config["SQLALCHEMY_DATABASE_URI"] =  db_url.replace("postgres", "postgresql")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -27,7 +24,6 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(70), nullable=False)
     body = db.Column(db.String(500))
-    # author = db.Column(db.String(20))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
     created = db.Column(db.DateTime, nullable=False, default=datetime.now)
 
@@ -54,7 +50,7 @@ db.create_all()
 
 @app.route("/")
 def index():
-    posts = Post.query.all()
+    posts = Post.query.order_by(-Post.created).all()
     return render_template("index.html", posts=posts)
 
 @app.route("/register", methods = ["GET","POST"]) #mesma rota para get e post
@@ -74,7 +70,6 @@ def register():
             flash("Username or E-mail already exists!")
         else:
             return redirect(url_for('login'))
-
     return render_template('register.html')
 
 @app.route('/login', methods = ["GET", "POST"])
@@ -90,7 +85,6 @@ def login():
             return redirect(url_for('login'))
         login_user(user)
         return redirect(url_for('index'))
-
     return render_template("login.html")
     
 @app.route('/logout')
