@@ -1,16 +1,21 @@
 from flask import Flask, render_template, redirect, url_for, request, flash
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, UserMixin, current_user, logout_user, login_user
-
+from flask_login import LoginManager, UserMixin, current_user, logout_user, login_user, login_required
 from sqlalchemy.exc import IntegrityError
+import os
 
 # UserMixin é como o Model. Queremos que o usuário seja logável
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
 app = Flask("hello") #nome da aplicação
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+#app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db" # este eu uso só para testar aqui
+# para usar no Heroku, variável de ambiente que ele enviou:
+# app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
+#ou:
+db_url = os.environ.get("DATABASE_URL") or "sqlite:///app.db"
+app.config["SQLALCHEMY_DATABASE_URI"] =  db_url.replace("postgres", "postgresql")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"]= "pudim"
 
@@ -91,4 +96,20 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return render_template("index")    
+    return redirect(url_for('index'))   
+    # return render_template("index") NÃO ESCREVER ASSIM
+    
+@app.route('/create', methods=["GET", "POST"])
+@login_required
+def create():
+    if request.method == "POST":
+        title = request.form['title']
+        body = request.form['body']
+        try:
+            post = Post(title=title, body=body, author=current_user)
+            db.session.add(post)
+            db.session.commit()
+            return redirect(url_for('index'))
+        except IntegrityError:
+            flash("Error in creating post")
+    return render_template('create.html')

@@ -6,13 +6,40 @@
     <link rel = "stylesheet" href="{{ url_for('static', filename='style.css')}}">
 </head>
 <body>
-    <h1>My Amazing Blog</h1>
     <nav>
+        <h1><a href="{{ url_for('index') }}">My Amazing Blog</a> </h1>
+        <ul>
+            <!-- {% if current_user.is_autenticated %}
+                <li><span>{{current_user.username}}</span></li>
+                <li><a href="{{url_for('logout')}}">Logout</a></li>
 
+                {% else %}
+                <li><a href="{{url_for('register')}}">Register</a></li>
+                <li><a href="{{url_for('login')}}">Login</a></li>
+            {% endif %} -->
+            {% if current_user.is_authenticated %}
+            <li><span> {{ current_user.username }} </span></li>
+            <li><a href="{{ url_for('logout') }}">Log Out</a></li>
+        {% else %}
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+            <li><a href="{{ url_for('login') }}">Log In</a></li>
+        {% endif %}
+
+        </ul>
     </nav>
+
     <section class="content">
+        <header>
+            {% block header %}
+            {% endblock %}
+        </header>
+        {% for message in get_flashed_messages() %}
+            <div class="flash"> {{ message }}</div>
+        {% endfor %}
+
         {% block content %}
         {% endblock %}
+
     </section>
 </body>
 </html>
