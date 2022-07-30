@@ -10,9 +10,9 @@
 {% block content %}
 <form method="POST">
     <lable for="title">Title:</lable>
-    <input id="title" name="title" required value="{{request.form['title']}}">
+    <input id="title" name="title" required value="{{ request.form['title'] }}">
     <label for="body">Body:</label>
-    <textarea id="body" name="body">{{ request.form['body' ]}}</textarea>
-    <input type="submit" name="submit" value="Post">
+    <textarea id="body" name="body">{{ request.form['body']}}</textarea>
+    <input type="submit" value="Post">
 </form>
 {% endblock %}

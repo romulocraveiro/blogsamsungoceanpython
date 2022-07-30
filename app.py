@@ -105,5 +105,5 @@ def create():
             db.session.commit()
             return redirect(url_for('index'))
         except IntegrityError:
-            flash("Error in creating post")
+            flash("Error in creating post. Try again later.")
     return render_template('create.html')
