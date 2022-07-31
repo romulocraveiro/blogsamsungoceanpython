@@ -6,8 +6,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy.exc import IntegrityError
 import os
 
-
-
 app = Flask("hello") #nome da aplicação
 #app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db" # este eu uso só para testar no gitpod
 # para usar no Heroku, variável de ambiente que ele enviou:
